@@ -1,29 +1,45 @@
-import Appointment from '@modules/appointments/infra/typeorm/entities/Appointment';
-import { getCustomRepository } from 'typeorm';
-import AppointmentsRepository from '@modules/appointments/repositories/AppointmentsRepository';
 import { startOfHour } from 'date-fns/fp';
+import { injectable, inject } from 'tsyringe';
+import AppError from '@shared/errors/AppError';
 
-interface RequestDTO{
+import Appointment from '@modules/appointments/infra/typeorm/entities/Appointment';
+import IAppointmentsRepository from '../repositories/IAppointimentsRepository';
+
+interface IRequestDTO{
   provider_id: string;
   date: Date;
 }
-class CreateAppointmentService{
-  public async execute({ date , provider_id }: RequestDTO): Promise<Appointment> {
-    const appointmentsRepository = getCustomRepository(AppointmentsRepository);
+/**
+ * @todo
+ * Usando injecão de dependencia (Pode se fazer isso no modulo user se quiser)
+ * Ver shared/container localcal onde esta sendo configurada a injeção de dependencia
+ */
+@injectable()
+class CreateAppointmentService {
+  /**
+   * @todo
+   * Usando DIP (Inversão de dependencia) minha service vai receber extamente o
+   * Repository que ele precisa para chamar a persistencia e o mais importante
+   */
+  constructor(
+    //@inject é da lib tsyringe para configurar injeção de dependecias
+    @inject('AppontmentsRepository')
+    private appointmentsRepository: IAppointmentsRepository
+  ){}
+
+  public async execute({ date , provider_id }: IRequestDTO): Promise<Appointment> {
     const appointmentDate = startOfHour(date);
 
-    const findAppointmentInSameDate = await appointmentsRepository.findByDate(appointmentDate);
+    const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(appointmentDate);
 
     if(findAppointmentInSameDate){
-      throw new Error('This appointment is already booked');
+      throw new AppError('This appointment is already booked');
     }
 
-    const appointment = appointmentsRepository.create({
+    const appointment = await this.appointmentsRepository.create({
       provider_id,
       date: appointmentDate
     });
-
-    await appointmentsRepository.save(appointment);
 
     return appointment;
 
