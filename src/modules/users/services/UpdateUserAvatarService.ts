@@ -5,7 +5,7 @@ import { injectable, inject } from 'tsyringe';
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 
 interface IRequest{
-  user_id : string;
+  user_id: string;
   avatarFileName: string;
 }
 @injectable()
