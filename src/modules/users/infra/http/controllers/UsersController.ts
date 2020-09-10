@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
 import CreateUserService from '@modules/users/services/CreateUserService';
 import UsersRepository from '@modules/users/infra/typeorm/repositories/UsersRepository';
+import { container } from 'tsyringe';
 
 export default class UsersController {
   public async create(request: Request, response: Response):Promise<Response> {
-    const usersRepository = new UsersRepository();
-
     try{
       const { name, email, password } = request.body;
-      const createUserService = new CreateUserService(usersRepository);
+      const createUserService = container.resolve(CreateUserService);
       const user = await createUserService.execute({
         name,
         email,

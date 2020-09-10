@@ -8,7 +8,7 @@ export default class AppointmentsController {
     const { provider_id , date } = request.body;
     const parsedDate = parseISO(date);
     /**
-     * @todo(Usando o container para fazer usar a injeção de dependencia no service)
+     * @todo(Usando o container para fazer a injeção de dependencia no service)
      */
     const createAppointment = container.resolve(CreateAppointmentService);
 

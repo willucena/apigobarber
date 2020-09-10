@@ -1,10 +1,10 @@
-// import User from "@modules/users/infra/typeorm/entities/User";
+import { injectable, inject } from "tsyringe";
+import path from 'path';
+
 import IMailProvider from '@shared/container/providers/MailProvider/models/IMailProvider';
 import IUsersRepository from "../repositories/IUsersRepository";
 import IUserTokensrepository from '../repositories/IUserTokensRepository';
 
-// import AppError from "@shared/errors/AppError";
-import { injectable, inject } from "tsyringe";
 import AppError from "@shared/errors/AppError";
 
 interface IRequest {
@@ -31,12 +31,25 @@ class SendForgotPasswordEmailService {
       throw new AppError("User does not exists");
     }
 
-    await this.userTokensRepository.generate(user.id);
+    const { token } = await this.userTokensRepository.generate(user.id);
 
-    this.mailProvider.sendEmail(
-      email,
-      'Pedido de recuperação de senha'
-    )
+    // Passa o caminho do template de email
+    const forgotPasswordTemplate = path.resolve(__dirname, '..','views', 'forgot_password.hbs')
+
+    await this.mailProvider.sendEmail({
+      to: {
+        name: user.name,
+        email: user.email,
+      },
+      subject: '[BarberShop] Recuperação de senha',
+      templateData: {
+        file: forgotPasswordTemplate,
+        variables: {
+          name: user.name,
+          link: `http://localhost:3000/reset_password?token=${token}`,
+        },
+      },
+    });
   }
 }
 

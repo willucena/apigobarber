@@ -11,8 +11,8 @@ interface IRequestDTO{
 }
 /**
  * @todo
- * Usando injecão de dependencia (Pode se fazer isso no modulo user se quiser)
- * Ver shared/container localcal onde esta sendo configurada a injeção de dependencia
+ * Usando injecão de dependencia
+ * Ver shared/container local onde esta sendo registrada as injeções de dependencias
  */
 @injectable()
 class CreateAppointmentService {
