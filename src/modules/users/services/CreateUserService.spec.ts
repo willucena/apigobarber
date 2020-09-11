@@ -15,34 +15,34 @@ let createUser: CreateUserService;
  */
 describe('CreateUser', () => {
   beforeEach(() => {
-     fakeUserRepository = new FakeUsersRepository();
-     fakeHashProvider= new FakeHashProvider();
-     createUser = new CreateUserService(fakeUserRepository, fakeHashProvider);
-  })
+    fakeUserRepository = new FakeUsersRepository();
+    fakeHashProvider = new FakeHashProvider();
+    createUser = new CreateUserService(fakeUserRepository, fakeHashProvider);
+  });
   it('should be able to create a new user', async () => {
-    const user =  await  createUser.execute({
-      name: "Julia Lima",
+    const user = await createUser.execute({
+      name: 'Julia Lima',
       email: 'julia@emailfaker.com',
-      password: '123456'
+      password: '123456',
     });
 
-   expect(user).toHaveProperty('id');
-   expect(user.email).toBe('julia@emailfaker.com');
+    expect(user).toHaveProperty('id');
+    expect(user.email).toBe('julia@emailfaker.com');
   });
 
   it('should no be able to create a new user with same email from another', async () => {
-   await  createUser.execute({
-      name: "Julia Lima",
+    await createUser.execute({
+      name: 'Julia Lima',
       email: 'julia@emailfaker.com',
-      password: '123456'
+      password: '123456',
     });
 
-   await expect(
-    createUser.execute({
-      name: "Julia Lima",
-      email: 'julia@emailfaker.com',
-      password: '123456'
-     })
-   ).rejects.toBeInstanceOf(AppError);
+    await expect(
+      createUser.execute({
+        name: 'Julia Lima',
+        email: 'julia@emailfaker.com',
+        password: '123456',
+      }),
+    ).rejects.toBeInstanceOf(AppError);
   });
-})
+});

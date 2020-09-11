@@ -1,14 +1,14 @@
-import { injectable, inject } from "tsyringe";
+import { injectable, inject } from 'tsyringe';
 import path from 'path';
 
 import IMailProvider from '@shared/container/providers/MailProvider/models/IMailProvider';
-import IUsersRepository from "../repositories/IUsersRepository";
+import IUsersRepository from '../repositories/IUsersRepository';
 import IUserTokensrepository from '../repositories/IUserTokensRepository';
 
-import AppError from "@shared/errors/AppError";
+import AppError from '@shared/errors/AppError';
 
 interface IRequest {
-  email: string,
+  email: string;
 }
 
 @injectable()
@@ -22,19 +22,24 @@ class SendForgotPasswordEmailService {
 
     @inject('UserTokensRepository')
     private userTokensRepository: IUserTokensrepository,
-    ){};
+  ) {}
 
-  public async execute({email}: IRequest): Promise<void>{
+  public async execute({ email }: IRequest): Promise<void> {
     const user = await this.usersRepository.findByEmail(email);
 
-    if(!user){
-      throw new AppError("User does not exists");
+    if (!user) {
+      throw new AppError('User does not exists');
     }
 
     const { token } = await this.userTokensRepository.generate(user.id);
 
     // Passa o caminho do template de email
-    const forgotPasswordTemplate = path.resolve(__dirname, '..','views', 'forgot_password.hbs')
+    const forgotPasswordTemplate = path.resolve(
+      __dirname,
+      '..',
+      'views',
+      'forgot_password.hbs',
+    );
 
     await this.mailProvider.sendEmail({
       to: {

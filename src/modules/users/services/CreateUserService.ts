@@ -1,31 +1,30 @@
-import IUsersRepository from "../repositories/IUsersRepository";
+import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
-import AppError from "@shared/errors/AppError";
-import { injectable, inject } from "tsyringe";
+import AppError from '@shared/errors/AppError';
+import { injectable, inject } from 'tsyringe';
 
 interface IRequest {
-  name: string,
-  email: string,
-  password: string,
+  name: string;
+  email: string;
+  password: string;
 }
 
 @injectable()
 class CreateUserService {
-
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
 
     @inject('HashProvider')
-    private hashProvider: IHashProvider
-    ){};
+    private hashProvider: IHashProvider,
+  ) {}
 
-  public async execute({ name, email , password }: IRequest){
+  public async execute({ name, email, password }: IRequest) {
     //validar existencia de um email
     const checkedUsersExists = await this.usersRepository.findByEmail(email);
 
-    if(checkedUsersExists){
+    if (checkedUsersExists) {
       throw new AppError('Email address already used.');
     }
     // Criando hash da senha
@@ -34,10 +33,10 @@ class CreateUserService {
     const user = await this.usersRepository.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
-   return user;
+    return user;
   }
 }
 

@@ -11,41 +11,43 @@ describe('UpdateUserAvatar', () => {
   beforeEach(() => {
     fakeUserUpdateAvatar = new FakeStorageProvider();
     fakeUserRepository = new FakeUsersRepository();
-    updateUserAvatar = new UpdateUserAvatar(fakeUserRepository, fakeUserUpdateAvatar);
-  })
+    updateUserAvatar = new UpdateUserAvatar(
+      fakeUserRepository,
+      fakeUserUpdateAvatar,
+    );
+  });
   it('should be able to update avatar', async () => {
     const user = await fakeUserRepository.create({
       name: 'Jonh Doe',
       email: 'jonh@doe.com',
-      password: '123456'
-    })
-   await  updateUserAvatar.execute({
+      password: '123456',
+    });
+    await updateUserAvatar.execute({
       user_id: user.id,
       avatarFileName: 'avatar.jpg',
     });
 
-   expect(user.avatar).toBe('avatar.jpg');
+    expect(user.avatar).toBe('avatar.jpg');
   });
 
   it('should not be able to update from non existing user', async () => {
-   expect(
-    updateUserAvatar.execute({
-      user_id: 'non-existings-user',
-      avatarFileName: 'avatar.jpg',
-    })
-   ).rejects.toBeInstanceOf(AppError);
+    expect(
+      updateUserAvatar.execute({
+        user_id: 'non-existings-user',
+        avatarFileName: 'avatar.jpg',
+      }),
+    ).rejects.toBeInstanceOf(AppError);
   });
 
   it('should delete old avatar when updating new one', async () => {
-
     // spyOn = Espionar se determinada função foi executada
     const deleteFile = jest.spyOn(fakeUserUpdateAvatar, 'deleteFile');
 
     const user = await fakeUserRepository.create({
       name: 'Jonh Doe',
       email: 'jonh@doe.com',
-      password: '123456'
-    })
+      password: '123456',
+    });
 
     await updateUserAvatar.execute({
       user_id: user.id,
@@ -57,7 +59,7 @@ describe('UpdateUserAvatar', () => {
       avatarFileName: 'avatar2.jpg',
     });
 
-   expect(deleteFile).toHaveBeenCalledWith('avatar.jpg')
-   expect(user.avatar).toBe('avatar2.jpg');
+    expect(deleteFile).toHaveBeenCalledWith('avatar.jpg');
+    expect(user.avatar).toBe('avatar2.jpg');
   });
-})
+});
