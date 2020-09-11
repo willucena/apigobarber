@@ -3,13 +3,17 @@ import FakeStorageProvider from '@shared/container/providers/StorageProvider/fak
 import UpdateUserAvatar from './UpdateUserAvatarService';
 import AppError from '@shared/errors/AppError';
 
+let fakeUserUpdateAvatar: FakeStorageProvider;
+let fakeUserRepository: FakeUsersRepository;
+let updateUserAvatar: UpdateUserAvatar;
+
 describe('UpdateUserAvatar', () => {
+  beforeEach(() => {
+    fakeUserUpdateAvatar = new FakeStorageProvider();
+    fakeUserRepository = new FakeUsersRepository();
+    updateUserAvatar = new UpdateUserAvatar(fakeUserRepository, fakeUserUpdateAvatar);
+  })
   it('should be able to update avatar', async () => {
-    const fakeUserUpdateAvatar = new FakeStorageProvider();
-    const fakeUserRepository = new FakeUsersRepository();
-
-    const updateUserAvatar = new UpdateUserAvatar(fakeUserRepository, fakeUserUpdateAvatar);
-
     const user = await fakeUserRepository.create({
       name: 'Jonh Doe',
       email: 'jonh@doe.com',
@@ -24,11 +28,6 @@ describe('UpdateUserAvatar', () => {
   });
 
   it('should not be able to update from non existing user', async () => {
-    const fakeUserUpdateAvatar = new FakeStorageProvider();
-    const fakeUserRepository = new FakeUsersRepository();
-
-    const updateUserAvatar = new UpdateUserAvatar(fakeUserRepository, fakeUserUpdateAvatar);
-
    expect(
     updateUserAvatar.execute({
       user_id: 'non-existings-user',
@@ -38,13 +37,9 @@ describe('UpdateUserAvatar', () => {
   });
 
   it('should delete old avatar when updating new one', async () => {
-    const fakeStorageProvider = new FakeStorageProvider();
-    const fakeUserRepository = new FakeUsersRepository();
 
     // spyOn = Espionar se determinada função foi executada
-    const deleteFile = jest.spyOn(fakeStorageProvider, 'deleteFile');
-
-    const updateUserAvatar = new UpdateUserAvatar(fakeUserRepository, fakeStorageProvider);
+    const deleteFile = jest.spyOn(fakeUserUpdateAvatar, 'deleteFile');
 
     const user = await fakeUserRepository.create({
       name: 'Jonh Doe',
@@ -62,7 +57,7 @@ describe('UpdateUserAvatar', () => {
       avatarFileName: 'avatar2.jpg',
     });
 
-  expect(deleteFile).toHaveBeenCalledWith('avatar.jpg')
+   expect(deleteFile).toHaveBeenCalledWith('avatar.jpg')
    expect(user.avatar).toBe('avatar2.jpg');
   });
 })
