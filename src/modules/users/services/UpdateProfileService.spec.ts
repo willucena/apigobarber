@@ -1,6 +1,4 @@
-// import AppError from '@shared/errors/AppError';
 import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
-// import FakeStorageProvider from '@shared/container/providers/StorageProvider/fakes/FakeStorageProvider';
 import UpdateProfileService from './UpdateProfileService';
 import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
 import AppError from '@shared/errors/AppError';
