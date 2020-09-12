@@ -48,10 +48,6 @@ class UpdateProfileService {
     user.name = name;
     user.email = email;
 
-    if (password) {
-      user.password = await this.hashPovider.generateHash(password);
-    }
-
     if (password && !old_password) {
       throw new AppError(
         'You need to inform old password to set a new password',
@@ -67,7 +63,10 @@ class UpdateProfileService {
       if (!checkOldPassoword) {
         throw new AppError('Old password does not match.');
       }
+
+      user.password = await this.hashPovider.generateHash(password);
     }
+
     return this.usersRepository.save(user);
   }
 }
