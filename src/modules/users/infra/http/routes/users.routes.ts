@@ -1,16 +1,17 @@
 import { Router } from 'express';
-import { celebrate, Segments, Joi } from 'celebrate'; // Esse cara é usado para fazer validações
-
 import multer from 'multer';
 import uploadConfig from '@config/upload';
-import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticated';
+import { celebrate, Segments, Joi } from 'celebrate'; // Esse cara é usado para fazer validações
+
 import UsersController from '../controllers/UsersController';
 import UserAvatarController from '../controllers/UserAvatarController';
+import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticated';
 
 const usersRouter = Router();
 const usersController = new UsersController();
 const userAvatarController = new UserAvatarController();
-const upload = multer(uploadConfig);
+
+const upload = multer(uploadConfig.multer);
 
 usersRouter.post(
   '/',
