@@ -1,14 +1,18 @@
+import FakeCacheProvider from '@shared/container/providers/CacheProvider/fakes/FakeCacheProvider';
 import FakeAppointmentRepository from '../repositories/fakes/FakeAppointmentsRepository';
 import ListProviderAppointmentService from './ListProviderAppointmentService';
 
 let listProviderAppointments: ListProviderAppointmentService;
 let fakeAppointmentsRepository: FakeAppointmentRepository;
+let fakeCacheProvider: FakeCacheProvider;
 
 describe('ListProviderAppointment', () => {
   beforeEach(() => {
     fakeAppointmentsRepository = new FakeAppointmentRepository();
+    fakeCacheProvider = new FakeCacheProvider();
     listProviderAppointments = new ListProviderAppointmentService(
       fakeAppointmentsRepository,
+      fakeCacheProvider,
     );
   });
   it('should be able to list the appointments on a specific day', async () => {
