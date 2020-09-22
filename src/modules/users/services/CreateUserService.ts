@@ -1,8 +1,10 @@
+import { injectable, inject } from 'tsyringe';
+import AppError from '@shared/errors/AppError';
+
 import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
-import AppError from '@shared/errors/AppError';
-import { injectable, inject } from 'tsyringe';
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
 
 interface IRequest {
   name: string;
@@ -18,6 +20,9 @@ class CreateUserService {
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
+
+    @inject('CacheProvider')
+    private cacheProvider: ICacheProvider,
   ) {}
 
   public async execute({ name, email, password }: IRequest) {
@@ -35,6 +40,9 @@ class CreateUserService {
       email,
       password: hashedPassword,
     });
+
+    // Limpa o Cache do REDIS toda vez que um novo usuário é criado
+    await this.cacheProvider.invalidatePrefix('provider-list');
 
     return user;
   }

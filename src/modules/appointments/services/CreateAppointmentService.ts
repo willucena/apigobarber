@@ -4,10 +4,10 @@ import AppError from '@shared/errors/AppError';
 
 import Appointment from '@modules/appointments/infra/typeorm/entities/Appointment';
 import IAppointmentsRepository from '../repositories/IAppointimentsRepository';
-import providersRouter from '../infra/http/routes/providers.routes';
 import INotificationsRepository from '@modules/notifications/repositories/INotificationsRepository';
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
 
-interface IRequestDTO {
+interface IRequest {
   provider_id: string;
   user_id: string;
   date: Date;
@@ -31,13 +31,16 @@ class CreateAppointmentService {
 
     @inject('NotificationsRepository')
     private notificationsRepository: INotificationsRepository,
+
+    @inject('CacheProvider')
+    private cacheProvider: ICacheProvider,
   ) {}
 
   public async execute({
     date,
     provider_id,
     user_id,
-  }: IRequestDTO): Promise<Appointment> {
+  }: IRequest): Promise<Appointment> {
     const appointmentDate = startOfHour(date);
 
     //Compara se data do agendamento é anterior data atual
@@ -67,14 +70,19 @@ class CreateAppointmentService {
       date: appointmentDate,
     });
 
-    const dateFormat = format(appointmentDate, "dd/MM/yyyy 'às' HH:mm'h'");
-
+    const dateFormat = format(appointmentDate, "d/M/ 'às' HH:mm");
     //Gravar notificação no mongodb
     await this.notificationsRepository.create({
       recipient_id: provider_id,
       content: `Novo agendamento para dia ${dateFormat}`,
     });
 
+    await this.cacheProvider.invalidate(
+      `provider-appointments:${provider_id}:${format(
+        appointmentDate,
+        'yyyy-MM-dd',
+      )}`,
+    );
     return appointment;
   }
 }
