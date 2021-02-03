@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mongo:
+    image: bitnami/mongodb:latest
+    volumes:
+      - /data/db/mongo
+    ports:
+    - "27017:27017"
+    environment:
+      MONGODB_DATABASE: gobarber
+      MONGODB_USERNAME: mongodb 
+      MONGODB_PASSWORD: mongodb
+
+  redis:
+    image: bitnami/redis:latest
+    volumes:
+      - /data/db/redis
+    ports:
+        - "6379:6379"
+    environment:
+      REDIS_PASSWORD: redis
+
+  postgres:
+    image: bitnami/postgresql:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_DATABASE: gobarber
+      PGDATA: /data/db/postgres
